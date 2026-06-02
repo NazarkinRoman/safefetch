@@ -1,10 +1,13 @@
 [package]
-authors = ["DarkSky <darksky2048@gmail.com>"]
-edition = "2024"
-license = "AGPL-3.0-only"
-name    = "safefetch"
-readme  = "README.md"
-version = "0.1.0"
+authors     = ["DarkSky <darksky2048@gmail.com>"]
+description = "A safe minimal fetching library."
+edition     = "2024"
+keywords    = ["fetch", "http", "https", "client", "server"]
+license     = "AGPL-3.0-only"
+name        = "safefetch"
+readme      = "README.md"
+repository  = "https://github.com/darkskygit/safefetch"
+version     = "0.1.0"
 
 [dependencies]
 anyhow = "1.0"
