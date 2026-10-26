@@ -86,6 +86,7 @@ fn image_mime_type(format: ImageFormat) -> Option<&'static str> {
     ImageFormat::Gif => Some("image/gif"),
     ImageFormat::WebP => Some("image/webp"),
     ImageFormat::Bmp => Some("image/bmp"),
+    ImageFormat::Ico => Some("image/vnd.microsoft.icon"),
     _ => None,
   }
 }
@@ -111,6 +112,49 @@ mod tests {
     assert_eq!(inspected.mime_type, "image/png");
     assert_eq!(inspected.width, 1);
     assert_eq!(inspected.height, 1);
+  }
+
+  const PNG_1X1: &[u8] = b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jfJ8AAAAASUVORK5CYII=";
+
+  /// A one-entry ICO whose image is the PNG above, the layout most favicons use.
+  fn ico_with_png() -> Vec<u8> {
+    let png = base64_simd::STANDARD.decode_to_vec(PNG_1X1).unwrap();
+    let mut ico = vec![0, 0, 1, 0, 1, 0];
+    ico.extend_from_slice(&[1, 1, 0, 0, 1, 0, 32, 0]);
+    ico.extend_from_slice(&(png.len() as u32).to_le_bytes());
+    ico.extend_from_slice(&22u32.to_le_bytes());
+    ico.extend_from_slice(&png);
+    ico
+  }
+
+  #[test]
+  fn inspects_ico_dimensions_without_decode() {
+    let inspected = inspect_image(
+      &ico_with_png(),
+      ImageInspectionOptions {
+        max_width: None,
+        max_height: None,
+        max_pixels: None,
+      },
+    )
+    .unwrap();
+    assert_eq!(inspected.mime_type, "image/vnd.microsoft.icon");
+    assert_eq!(inspected.width, 1);
+    assert_eq!(inspected.height, 1);
+  }
+
+  #[test]
+  fn rejects_truncated_ico() {
+    let ico = ico_with_png();
+    let result = inspect_image(
+      &ico[..10],
+      ImageInspectionOptions {
+        max_width: None,
+        max_height: None,
+        max_pixels: None,
+      },
+    );
+    assert!(result.is_err());
   }
 
   #[test]

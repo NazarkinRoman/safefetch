@@ -19,6 +19,7 @@ hickory-resolver = { version = "0.26", features = [
 image = { version = "0.25", default-features = false, features = [
   "bmp",
   "gif",
+  "ico",
   "jpeg",
   "png",
   "webp",
